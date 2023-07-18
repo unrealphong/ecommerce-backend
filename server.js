@@ -1,17 +1,18 @@
-require("dotenv").config({
-  path: process.env.NODE_ENV === "development" ? ".env.dev" : ".env",
-});
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'development' ? '.env.dev' : '.env',
+})
 
-const app = require("./src/app");
-
-const PORT = process.env.PORT || 3333;
+const PORT = process.env.PORT || 3333
+const app = require('./src/app')
 
 const server = app.listen(PORT, () => {
-  console.log(`WSV eCommerce start with ${PORT}`);
-});
+  console.log(`WSV eCommerce start with ${PORT}`)
+})
 
-process.on("SIGINT", () => {
+process.on('SIGINT', () => {
+  console.log('\nClosing server and exiting...')
   server.close(() => {
-    console.log(`Exit Server Express`);
-  });
-});
+    console.log('Server closed.')
+    process.exit(0)
+  })
+})
