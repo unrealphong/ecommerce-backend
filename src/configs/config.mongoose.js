@@ -1,7 +1,8 @@
 'use strict'
 const mongoose = require('mongoose')
 
-const connectString = 'mongodb://localhost:27017/ecommerce'
+const connectString =
+  'mongodb://admin:admin@localhost:27017/test?authSource=admin'
 
 class Database {
   constructor() {

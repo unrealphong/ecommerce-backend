@@ -12,19 +12,13 @@ app.use(morgan('dev'))
 // app.use(morgan("tiny"));
 app.use(helmet())
 app.use(compression())
-
+app.use(express.json({ limit: '10kb' }))
 // init db
 require('./configs/config.mongoose')
-const { checkOverload } = require('./helpers/check.connect')
-checkOverload()
+// const { checkOverload } = require('./helpers/check.connect')
+// checkOverload()
 // init router
-app.get('/', (_req, res) => {
-  const strCompress = 'Hello le hong phong'
-  return res.status(200).json({
-    massage: 'Welcome Fanpage',
-    metadata: strCompress.repeat(1000),
-  })
-})
+app.use('', require('./routes'))
 // handle error
 
 module.exports = app
