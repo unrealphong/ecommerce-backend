@@ -35,3 +35,15 @@
           - Preallocation pattern
           - Document versioning pattenr
           - Schema versioning pattern
+
+### Handler Auth
+
+    https://github.com/madhums/node-express-mongoose-demo.git
+
+### Api key
+
+    `Lưu trữ key cung cấp cho các đối tác được truy cập vào hệ thống`
+
+### Design Schema MongoDB - Polymorphic Pattern
+
+    - 1document 1kb -> 50tr = 50gb

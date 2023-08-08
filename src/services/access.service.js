@@ -3,11 +3,14 @@ const shopModel = require('../models/shop.model')
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
 const KeyTokenService = require('./keytoken.service')
-const { createTokenPair } = require('../auth/authUtils')
+const { createTokenPair, verifyJwt } = require('../auth/authUtils')
 const { getInfoData } = require('../utils')
-const { BadRequestError, AuthFailureError } = require('../core/error.response')
+const {
+  BadRequestError,
+  AuthFailureError,
+  ForbiddenError,
+} = require('../core/error.response')
 const { findByEmail } = require('./shop.service')
-const { log } = require('console')
 const RoleShop = {
   SHOP: 'SHOP',
   WRITER: 'WRITER',
@@ -84,7 +87,7 @@ class AccessService {
       const publicKey = crypto.randomBytes(64).toString('hex')
       // public key CryptoGraphy Standards
 
-      // console.log({ privateKey, publicKey }) // save collection KeyStore
+      console.log({ privateKey, publicKey }) // save collection KeyStore
 
       const keyStore = await KeyTokenService.createKeyToken({
         userId: newShop._id,
@@ -112,7 +115,6 @@ class AccessService {
       console.log(`create token success:`, tokens)
 
       return {
-        code: 201,
         metadata: {
           shop: getInfoData({
             fields: ['_id', 'name', 'email'],
@@ -121,6 +123,44 @@ class AccessService {
         },
         tokens,
       }
+    }
+  }
+  /**
+   *  check this token used
+   */
+  static handlerRefreshToken = async ({ refreshToken, user, keyStore }) => {
+    const { userId, email } = user
+
+    if (keyStore.refreshTokenUsed.includes(refreshToken)) {
+      await KeyTokenService.deleteKeyById(userId)
+      throw new ForbiddenError('Something wrong happen! Pls relogin')
+    }
+
+    if (keyStore.refreshToken !== refreshToken)
+      throw new AuthFailureError('Shop not reg!')
+
+    const foundShop = await findByEmail({ email })
+    if (!foundShop) throw new AuthFailureError('Shop not reg!')
+
+    // create tokens
+    const tokens = await createTokenPair(
+      { userId, email },
+      keyStore.publicKey,
+      keyStore.privateKey,
+    )
+
+    await keyStore.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokenUsed: refreshToken,
+      },
+    })
+
+    return {
+      user,
+      tokens,
     }
   }
 }

@@ -19,29 +19,29 @@ class SuccessResponse {
 }
 
 class Ok extends SuccessResponse {
-  constructor({ message, data = {}, options = {} }) {
-    super({ message, data, options })
+  constructor({ message, metadata = {}, options = {} }) {
+    super({ message, metadata, options })
   }
 }
 
 class Create extends SuccessResponse {
-  constructor({ message, data = {}, options = {} }) {
-    super({ message, status: StatusCodes.CREATED, data, options })
+  constructor({ message, metadata = {}, options = {} }) {
+    super({ message, status: StatusCodes.CREATED, metadata, options })
   }
 }
 
-const CREATED = (res, message, data, options = {}) => {
+const CREATED = (res, message, metadata, options = {}) => {
   new Create({
     message,
-    data,
+    metadata,
     options,
   }).send(res)
 }
 
-const OK = (res, message, data, options = {}) => {
+const OK = (res, message, metadata, options = {}) => {
   new Ok({
     message,
-    data,
+    metadata,
     options,
   }).send(res)
 }
