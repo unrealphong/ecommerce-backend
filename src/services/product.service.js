@@ -4,15 +4,27 @@ const { BadRequestError } = require('../core/error.response')
 const { product, clothing, electronic } = require('../models/product.model')
 
 class productFactory {
+  // static async createProduct(type, payload) {
+  //   switch (type) {
+  //     case 'Clothing':
+  //       return new Clothing(payload).createProduct()
+  //     case 'Electronic':
+  //       return new Electronic(payload).createProduct()
+  //     default:
+  //       throw new BadRequestError(`Invalid Product Types ${type}`)
+  //   }
+  // }
+  static productRegistry = {} // key class
+
+  static registerProductType(type, classRef) {
+    productFactory.productRegistry[type] = classRef
+  }
+
   static async createProduct(type, payload) {
-    switch (type) {
-      case 'Clothing':
-        return new Clothing(payload).createProduct()
-      case 'Electronic':
-        return new Electronic(payload).createProduct()
-      default:
-        throw new BadRequestError(`Invalid Product Types ${type}`)
-    }
+    const productClass = productFactory.productRegistry[type]
+    if (!productClass) throw new BadRequestError(`Invalid Product Type ${type}`)
+
+    return await new productClass(payload).createProduct()
   }
 }
 
@@ -67,5 +79,8 @@ class Electronic extends Product {
     return newProduct
   }
 }
+
+productFactory.registerProductType('Electronic', Electronic)
+productFactory.registerProductType('Clothing', Clothing)
 
 module.exports = productFactory
