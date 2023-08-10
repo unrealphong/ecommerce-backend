@@ -11,4 +11,5 @@ router.use(authenticationV2)
 
 router.post('/shop/logout', accessController.logout)
 router.post('/shop/refresh-token', accessController.handlerRefreshToken)
+
 module.exports = router
