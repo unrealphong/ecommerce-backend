@@ -58,6 +58,7 @@ const authentication = catchAsync(async (req, res, next) => {
 
     if (userId !== decodeUser.userId) throw new AuthFailureError('4')
     req.keyStore = keyStore
+    req.user = decodeUser
     return next()
   } catch (error) {
     throw error
@@ -103,6 +104,7 @@ const authenticationV2 = catchAsync(async (req, res, next) => {
 
     if (userId !== decodeUser.userId) throw new AuthFailureError('4')
     req.keyStore = keyStore
+    req.user = decodeUser
     return next()
   } catch (error) {
     throw error
