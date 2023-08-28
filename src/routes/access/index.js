@@ -3,6 +3,7 @@ const accessController = require('../../controllers/access.controller')
 const { authentication, authenticationV2 } = require('../../auth/authUtils')
 
 const router = Router()
+
 router.post('/shop/signup', accessController.signUp)
 router.post('/shop/login', accessController.login)
 

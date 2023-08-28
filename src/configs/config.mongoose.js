@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 
 const connectString =
-  'mongodb://admin:admin@localhost:27018/test?authSource=admin'
+  'mongodb://admin:admin@localhost:27018/shopDev?authSource=admin'
 
 class Database {
   constructor() {

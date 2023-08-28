@@ -5,6 +5,8 @@ const productController = require('../../controllers/product.controller')
 const router = Router()
 
 router.get('/search/:keySearch', productController.getListSearchProduct)
+router.get('', productController.findAllProducts)
+router.get('/:product_id', productController.findProductById)
 // authentication
 router.use(authenticationV2)
 
