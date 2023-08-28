@@ -10,7 +10,9 @@ const {
   searchProductByUser,
   findAllProducts,
   findProduct,
+  updateProductById,
 } = require('../models/repositories/product.repo')
+const { removeUndefinedObject, updateNestedObject } = require('../utils')
 
 class productFactory {
   static productRegistry = {} // key class
@@ -24,6 +26,12 @@ class productFactory {
     if (!productClass) throw new BadRequestError(`Invalid Product Type ${type}`)
 
     return await new productClass(payload).createProduct()
+  }
+
+  static async updateProduct(type, product_id, payload) {
+    const productClass = productFactory.productRegistry[type]
+    if (!productClass) throw new BadRequestError(`Invalid Product Type ${type}`)
+    return await new productClass(payload).updateProduct(product_id)
   }
   /**
    * @query
@@ -94,6 +102,10 @@ class Product {
   async createProduct(product_id) {
     return await product.create({ ...this, _id: product_id })
   }
+
+  async updateProduct(product_id, payload) {
+    return await updateProductById({ product_id, payload, model: product })
+  }
 }
 
 class Clothing extends Product {
@@ -105,6 +117,27 @@ class Clothing extends Product {
     if (!newProduct) throw new BadRequestError('create new product error')
 
     return newProduct
+  }
+
+  async updateProduct(product_id) {
+    // console.log('this', this)
+
+    const payload = removeUndefinedObject(this)
+
+    // console.log('payload', payload)
+
+    if (payload.product_attributes) {
+      await updateProductById({
+        product_id,
+        payload: updateNestedObject(payload.product_attributes),
+        model: clothing,
+      })
+    }
+    const updateProduct = super.updateProduct(
+      product_id,
+      updateNestedObject(payload),
+    )
+    return updateProduct
   }
 }
 class Electronic extends Product {
@@ -119,6 +152,20 @@ class Electronic extends Product {
     if (!newProduct) throw new BadRequestError('create new product error')
 
     return newProduct
+  }
+
+  async updateProduct(product_id) {
+    console.log('this', this)
+
+    const payload = removeUndefinedObject(this)
+
+    console.log('payload', payload)
+
+    if (payload.product_attributes) {
+      await updateProductById({ product_id, payload, model: electronic })
+    }
+    const updateProduct = super.updateProduct(product_id, payload)
+    return updateProduct
   }
 }
 
