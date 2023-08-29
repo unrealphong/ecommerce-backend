@@ -15,10 +15,11 @@ const discountSchema = new Schema(
     discount_startDate: { type: Date, required: true },
     discount_endDate: { type: Date, required: true },
     discount_maxUse: { type: Number, requered: true }, // max use
+    discount_maxValue: { type: Number, required: true },
     discount_maxUsePerUser: { type: Number, requered: true }, // max use per user
-    discount_usesCount: { type: Number, default: 0 }, // number of times the discount has been used
-    discount_usesUser: { type: Array, default: [] }, // user_id
-    discount_minOrder: { type: Number, default: 0 }, // min order to use the discount
+    discount_usesCount: { type: Number, required: true }, // number of times the discount has been used
+    discount_usersUsed: { type: Array, default: [] }, // user_id
+    discount_minOrder: { type: Number, required: true }, // min order to use the discount
     discount_shopId: { type: Schema.Types.ObjectId, ref: 'Shop' },
     discount_status: { type: Boolean, default: true }, // active or inactive
     discount_applyTo: {

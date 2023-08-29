@@ -1,4 +1,4 @@
-'use strict'
+// 'use strict'
 
 const { Types } = require('mongoose')
 const { product, electronic, clothing } = require('../product.model')
