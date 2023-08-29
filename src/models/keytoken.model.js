@@ -1,3 +1,5 @@
+'use strict'
+
 const { Schema, model } = require('mongoose')
 const DOCUMENT_NAME = 'Key'
 const COLLECTION_NAME = 'Keys'

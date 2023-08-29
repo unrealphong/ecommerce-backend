@@ -1,3 +1,5 @@
+'use strict'
+
 const { Schema, model } = require('mongoose')
 const slugify = require('slugify')
 const DOCUMENT_NAME = 'Product'
@@ -39,7 +41,7 @@ const productSchema = new Schema(
 productSchema.index({ product_name: 'text', product_description: 'text' })
 
 // document middleware: runs before .save() and create(),...
-productSchema.pre('save', function (next) {
+productSchema.pre('save', function(next) {
   this.product_slug = slugify(this.product_name, { lower: true })
   next()
 })

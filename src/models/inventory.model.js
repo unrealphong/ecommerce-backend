@@ -1,3 +1,5 @@
+'use strict'
+
 const { model, Schema, Types } = require('mongoose')
 
 const DOCUMENT_NAME = 'Inventory'
