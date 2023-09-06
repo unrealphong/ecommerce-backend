@@ -70,7 +70,12 @@ class productFactory {
       sort,
       page,
       filter,
-      select: ['product_name', 'product_thumb', 'product_price'],
+      select: [
+        'product_name',
+        'product_thumb',
+        'product_price',
+        'product_shop',
+      ],
     })
   }
 

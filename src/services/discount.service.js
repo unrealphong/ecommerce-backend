@@ -1,15 +1,15 @@
-'use strict'
-const { BadRequestError, NotFoundError } = require('../core/error.response')
-const { OK } = require('../core/success.response')
-const discount = require('../models/discount.model')
-const { product } = require('../models/product.model')
+'use strict';
+const { BadRequestError, NotFoundError } = require('../core/error.response');
+const { OK } = require('../core/success.response');
+const discount = require('../models/discount.model');
+const { product } = require('../models/product.model');
 const {
   findAllDiscountCodesUnSelect,
   checkDiscountExists,
   findAllDiscountCodesSelect,
-} = require('../models/repositories/discount.repo')
-const { findAllProducts } = require('../models/repositories/product.repo')
-const { convertToObjectId } = require('../utils')
+} = require('../models/repositories/discount.repo');
+const { findAllProducts } = require('../models/repositories/product.repo');
+const { convertToObjectId } = require('../utils');
 /**
  *  Discount service
  *
@@ -42,14 +42,14 @@ class DiscountService {
       uses_count,
       max_uses_per_user,
       uses_used,
-    } = payload
+    } = payload;
 
-    // if (new Date() < new Date(start_date) || new Date() > new Date(end_date)) {
-    //   throw new BadRequestError('Discount code has expired')
-    // }
+    if (new Date() < new Date(start_date) || new Date() > new Date(end_date)) {
+      throw new BadRequestError('Discount code has expired');
+    }
 
     if (new Date(start_date) >= new Date(end_date))
-      throw new BadRequestError('Start data must be before end date')
+      throw new BadRequestError('Start data must be before end date');
 
     // create index for discount code
     const foundDiscount = await discount
@@ -57,10 +57,10 @@ class DiscountService {
         discount_code: code,
         discount_shopId: convertToObjectId(shopId),
       })
-      .lean()
+      .lean();
 
     if (foundDiscount && foundDiscount.discount_status) {
-      throw new BadRequestError('Discount code already exists')
+      throw new BadRequestError('Discount code already exists');
     }
 
     const newDiscount = await discount.create({
@@ -81,12 +81,12 @@ class DiscountService {
       discount_status: status,
       discount_productIds: applies_to === 'all' ? [] : productIds,
       discount_maxUsePerUser: max_uses_per_user,
-    })
+    });
 
-    return newDiscount
+    return newDiscount;
   }
 
-  static async updateDiscountCode() { }
+  static async updateDiscountCode({ discount_code }) { }
 
   /*
       Get all discount codes available with products
@@ -105,13 +105,13 @@ class DiscountService {
         discount_code: code,
         discount_shopId: convertToObjectId(shopId),
       })
-      .lean()
+      .lean();
     if (!foundDiscount || !foundDiscount.discount_status)
-      throw new NotFoundError('Discount code not found')
+      throw new NotFoundError('Discount code not found');
 
-    const { discount_productIds, discount_applyTo } = foundDiscount
+    const { discount_productIds, discount_applyTo } = foundDiscount;
 
-    let products
+    let products;
     if (discount_applyTo === 'all') {
       products = await findAllProducts({
         filter: {
@@ -122,7 +122,7 @@ class DiscountService {
         page: +page,
         sort: 'ctime',
         select: ['product_name', 'product_price', 'product_discount'],
-      })
+      });
     }
 
     if (discount_applyTo === 'specific') {
@@ -135,10 +135,10 @@ class DiscountService {
         page: +page,
         sort: 'ctime',
         select: ['product_name', 'product_price', 'product_discount'],
-      })
+      });
     }
 
-    return products
+    return products;
   }
 
   /*
@@ -154,8 +154,8 @@ class DiscountService {
       },
       select: ['discount_code', 'discount_name', 'discount_description'],
       model: discount,
-    })
-    return discounts
+    });
+    return discounts;
   }
 
   /*
@@ -186,9 +186,9 @@ class DiscountService {
         discount_code: codeId,
         discount_shopId: convertToObjectId(shopId),
       },
-    })
+    });
 
-    if (!foundDiscount) throw new NotFoundError('Discount code not found')
+    if (!foundDiscount) throw new NotFoundError('Discount code not found');
 
     const {
       discount_status,
@@ -198,36 +198,36 @@ class DiscountService {
       discount_maxUsePerUser,
       discount_type,
       discount_value,
-    } = foundDiscount
-    if (!discount_status) throw new NotFoundError('Discount code not found')
-    if (!discount_maxUse) throw new NotFoundError('Discount code not found')
+    } = foundDiscount;
+    if (!discount_status) throw new NotFoundError('Discount code not found');
+    if (!discount_maxUse) throw new NotFoundError('Discount code not found');
 
     if (
       new Date() < new Date(foundDiscount.discount_startDate) ||
       new Date() > new Date(foundDiscount.discount_endDate)
     ) {
-      throw new NotFoundError('Discount code has expired')
+      throw new NotFoundError('Discount code has expired');
     }
 
-    let totalOrder = 0
+    let totalOrder = 0;
 
     if (discount_minOrder > 0) {
       totalOrder = products.reduce((previous, current) => {
-        return previous + current.price * current.quantity
-      }, 0)
+        return previous + current.price * current.quantity;
+      }, 0);
 
       if (totalOrder < discount_minOrder) {
         throw new BadRequestError(
           `Discount code is only valid for orders over ${discount_minOrder}`,
-        )
+        );
       }
     }
 
-    console.log('totalOrder', totalOrder)
+    console.log('totalOrder', totalOrder);
     if (discount_maxUsePerUser > 0) {
       const userUserDiscount = await discount_usersUsed.find(
         (user) => user.userId === userId,
-      )
+      );
       if (userUserDiscount) {
       }
     }
@@ -235,13 +235,13 @@ class DiscountService {
     const discountAmount =
       discount_type === 'fixed_amount'
         ? discount_value
-        : (totalOrder * discount_value) / 100
+        : (totalOrder * discount_value) / 100;
 
     return {
       totalOrder,
       discount: discountAmount,
       totalPrice: totalOrder - discountAmount,
-    }
+    };
   }
 
   /*
@@ -252,17 +252,17 @@ class DiscountService {
     const foundDiscount = await discount.findOne({
       discount_code: codeId,
       discount_shopId: convertToObjectId(shopId),
-    })
+    });
 
-    if (!foundDiscount) throw new NotFoundError('Discount code not found')
+    if (!foundDiscount) throw new NotFoundError('Discount code not found');
 
     if (foundDiscount.discount_status)
-      throw new BadRequestError('Discount code is active')
+      throw new BadRequestError('Discount code is active');
 
-    await discount.deleteOne()
+    await discount.deleteOne();
     return {
       message: 'Discount code deleted successfully',
-    }
+    };
   }
 
   static async cancelDiscountCode({ codeId, shopId }) {
@@ -272,14 +272,14 @@ class DiscountService {
         discount_code: codeId,
         discount_shopId: convertToObjectId(shopId),
       },
-    })
+    });
 
-    if (!foundDiscount) throw new NotFoundError('Discount code not found')
+    if (!foundDiscount) throw new NotFoundError('Discount code not found');
 
     if (!foundDiscount.discount_status)
-      throw new BadRequestError('Discount code is already inactive')
+      throw new BadRequestError('Discount code is already inactive');
 
-    foundDiscount.discount_status = false
+    foundDiscount.discount_status = false;
     const result = await discount.findOneAndUpdate(foundDiscount._id, {
       $pull: {
         discount_usersUsed: userId,
@@ -289,9 +289,9 @@ class DiscountService {
         discount_maxUse: 1,
         discount_usesCount: -1,
       },
-    })
-    return result
+    });
+    return result;
   }
 }
 
-module.exports = DiscountService
+module.exports = DiscountService;
