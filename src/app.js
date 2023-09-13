@@ -23,6 +23,10 @@ require('./configs/config.mongoose')
 // const { checkOverload } = require('./helpers/check.connect')
 // checkOverload()
 
+// init swagger
+const { openApi, configSwagger } = require('./configs/config.swagger')
+openApi(app)
+
 // init router
 app.use('', require('./routes'))
 
